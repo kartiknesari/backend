@@ -1,0 +1,36 @@
+tree --prune -I 'venv' > file_structure.txt
+.
+├── backend
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-313.pyc
+│   │   ├── settings.cpython-313.pyc
+│   │   ├── urls.cpython-313.pyc
+│   │   └── wsgi.cpython-313.pyc
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── file_structure.txt
+├── manage.py
+└── users
+    ├── apps.py
+    ├── migrations
+    │   ├── 0001_initial.py
+    │   ├── 0002_alter_customuser_options_and_more.py
+    │   ├── __init__.py
+    │   └── __pycache__
+    │       ├── 0001_initial.cpython-313.pyc
+    │       ├── 0002_alter_customuser_options_and_more.cpython-313.pyc
+    │       └── __init__.cpython-313.pyc
+    ├── models.py
+    ├── __pycache__
+    │   ├── apps.cpython-313.pyc
+    │   ├── models.cpython-313.pyc
+    │   ├── serializers.cpython-313.pyc
+    │   ├── urls.cpython-313.pyc
+    │   └── views.cpython-313.pyc
+    ├── serializers.py
+    ├── urls.py
+    └── views.py
+
+7 directories, 26 files
