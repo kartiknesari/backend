@@ -27,7 +27,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the Django project files
 COPY . .
 
-RUN python3 manager.py spectacular --color --file "schema.yml"
+RUN python3 ./manager.py spectacular --color --file "schema.yml"
 # Expose the Gunicorn/Django server port
 EXPOSE 8000
 

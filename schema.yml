@@ -697,19 +697,6 @@ components:
       required:
       - id
       - name
-    DomainNameId:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        name:
-          type: string
-          maxLength: 100
-      required:
-      - id
-      - name
     PatchedDomain:
       type: object
       properties:
@@ -737,13 +724,12 @@ components:
           format: uuid
           readOnly: true
         domain:
-          allOf:
-          - $ref: '#/components/schemas/DomainNameId'
-          readOnly: true
+          type: string
+          format: uuid
         topic:
-          allOf:
-          - $ref: '#/components/schemas/Topic'
-          readOnly: true
+          type: string
+          format: uuid
+          nullable: true
         type:
           $ref: '#/components/schemas/TypeEnum'
         question:
@@ -829,13 +815,12 @@ components:
           format: uuid
           readOnly: true
         domain:
-          allOf:
-          - $ref: '#/components/schemas/DomainNameId'
-          readOnly: true
+          type: string
+          format: uuid
         topic:
-          allOf:
-          - $ref: '#/components/schemas/Topic'
-          readOnly: true
+          type: string
+          format: uuid
+          nullable: true
         type:
           $ref: '#/components/schemas/TypeEnum'
         question:
@@ -878,7 +863,6 @@ components:
       - domain
       - id
       - question
-      - topic
       - type
       - updated_at
     RoleEnum:
