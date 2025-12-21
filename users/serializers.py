@@ -87,3 +87,8 @@ class UserSigninSerializer(serializers.Serializer):
             )
         attrs["user"] = user
         return attrs
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ["user_id", "middle_name", "email", "role", "access_level"]

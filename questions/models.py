@@ -2,7 +2,9 @@
 import uuid
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.forms import ValidationError
 from django.utils.text import slugify
+from . import models_payload as payload
 
 
 # ----------------------------------------------------------------------
@@ -29,13 +31,15 @@ class Domain(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    slug = models.SlugField(max_length=50, unique=True, help_text="URL-safe identifier")
+    slug = models.SlugField(
+        max_length=50, unique=True, help_text="URL-safe identifier", blank=True
+    )
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        verbose_name = "Domain"
+        verbose_name = "Domains"
         ordering = ["name"]
 
     def save(self, *args, **kwargs):
@@ -84,7 +88,7 @@ class Topic(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     domain = models.ForeignKey(Domain, on_delete=models.CASCADE, related_name="topics")
-    slug = models.SlugField(max_length=100)
+    slug = models.SlugField(max_length=100, blank=True)
     name = models.CharField(max_length=150)
     description = models.TextField(blank=True)
 
@@ -116,15 +120,9 @@ class Question(models.Model):
     type : CharField(max_length=5, choices=QUESTION_TYPES), Question format: mcq, num, case, diag. Indexed for filtering.
     text : TextField, Question prompt. LaTeX supported (use $$ for display math).
     explanation : TextField, Optional solution shown after grading.
-    difficulty : PositiveSmallIntegerField(1–5), 1 = easy, 5 = expert.
+    difficulty : PositiveSmallIntegerField(1–5)
     points : PositiveSmallIntegerField, Default 1. Score weight.
     time_estimate_seconds : PositiveSmallIntegerField, Default 120. Expected completion time.
-    data : JSONField
-        Type-specific payload:
-          - MCQ:  {"options": [...], "correct": "A", "shuffle": true}
-          - NUM:  {"answer": 42.0, "unit": "kPa", "tolerance": 0.02}
-          - DIAG: {"image_url": "...", "hotspots": [...]}
-          - CASE: {"rubric": {"criteria": "Safety", "max": 5}}
     created_by : ForeignKey(CustomUser, SET_NULL), Author (SME). Nullable.
     created_at / updated_at : DateTimeField, Auto-managed timestamps.
     is_active : BooleanField, Default True. Soft-delete flag.
@@ -165,14 +163,15 @@ class Question(models.Model):
     type = models.CharField(max_length=5, choices=QUESTION_TYPES, db_index=True)
 
     # Core content
-    text = models.TextField(help_text="LaTeX supported. Use $$ for display math.")
-    explanation = models.TextField(
+    question = models.TextField(help_text="LaTeX supported. Use $$ for display math.")
+    description = models.TextField(
         blank=True, help_text="Solution / explanation shown after grading"
     )
 
     # Metadata
     difficulty = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
+        default=1,
         help_text="1 = easy, 5 = expert",
     )
     points = models.PositiveSmallIntegerField(default=1, help_text="Score weight")
@@ -181,17 +180,17 @@ class Question(models.Model):
     )
 
     # Data payload (type-specific)
-    data = models.JSONField(
-        verbose_name="question_types_specific_adata",
-        default=dict,
-        help_text="""
-        MCQ: {"options": ["A", "B", ...], "correct": "A", "shuffle": true}
-        NUM: {"answer": 42.0, "unit": "kPa", "tolerance": 0.02}
-        DIAG: {"image_url": "...", "hotspots": [{"x":10,"y":20,"label":"Pump"}]}
-        CASE: {"rubric": {"criteria": "Safety", "max": 5}}
-        SIM: {"scenario": "json", "expected_output": {...}}
-        """,
-    )
+    # data = models.JSONField(
+    #     verbose_name="question_types_specific_adata",
+    #     default=dict,
+    #     help_text="""
+    #     MCQ: {"options": ["A", "B", ...], "correct": "A", "shuffle": true}
+    #     NUM: {"answer": 42.0, "unit": "kPa", "tolerance": 0.02}
+    #     DIAG: {"image_url": "...", "hotspots": [{"x":10,"y":20,"label":"Pump"}]}
+    #     CASE: {"rubric": {"criteria": "Safety", "max": 5}}
+    #     SIM: {"scenario": "json", "expected_output": {...}}
+    #     """,
+    # )
 
     # Auditing
     created_by = models.ForeignKey(
@@ -217,3 +216,7 @@ class Question(models.Model):
         type_label = dict(self.QUESTION_TYPES).get(self.type, self.type)
         preview = self.text[:60] + ("..." if len(self.text) > 60 else "")
         return f"[{type_label}] {preview}"
+
+    def save(self, *args, **kwargs):
+        # self.clean() # Validation is handled by payload models and serializers
+        super().save(*args, **kwargs)

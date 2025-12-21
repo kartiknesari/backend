@@ -1,13 +1,24 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+if "IS_DOCKER_CONTAINER" not in os.environ:
+    load_dotenv(dotenv_path=".env.local")
+    print("Loaded local env file")
+else:
+    # env variables already loaded via docker
+    print("Loaded docker env variables")
+    pass
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-your-secret-key-here"
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
-DEBUG = True
+DEBUG = os.environ.get("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOSTS")]
+
+HOST_IP = os.environ.get("DJANGO_HOST_IP")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -16,10 +27,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_filters",
     "rest_framework",
     "corsheaders",
     "users",
     "questions",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -56,11 +69,11 @@ WSGI_APPLICATION = "backend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "hr_db",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": os.environ.get("POSTGRES_DB"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+        "HOST": os.environ.get("DATABASE_HOST"),
+        "PORT": os.environ.get("DATABASE_PORT"),
     }
 }
 
@@ -94,6 +107,37 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://corene-urbanistic-lin.ngrok-free.dev",
+    "https://active-tuna-82.rshare.io",
+]
 CORS_ALLOW_ALL_ORIGINS = True  # Only for development!
+
+# Add ngrok-skip-browser-warning to allowed headers for ngrok usage
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+    "ngrok-skip-browser-warning",  # Allow this specific header
+]
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Assessments Backend",
+    "DESCRIPTION": "An online assessment backend specifically for chemical engineering tests",
+    "VERSION": "0.1.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SERVERS": [
+        {"url": HOST_IP, "description": "Local development server"},
+    ],
+    # OTHER SETTINGS
+}

@@ -4,8 +4,8 @@ from rest_framework.routers import DefaultRouter
 from . import views
 
 router = DefaultRouter()
-router.register(r"domains", views.DomainViewSet, basename="domain")
-router.register(r"topics", views.TopicViewSet, basename="topic")
-router.register(r"questions", views.QuestionViewSet, basename="question")
+router.register(r"domains", views.DomainViewSet, basename="domains")
+router.register(r"topics", views.TopicViewSet, basename="topics")
+router.register(r"", views.QuestionViewSet, basename="questions")
 
 urlpatterns = router.urls

@@ -1,0 +1,20 @@
+name: pg_hrApp_dev
+services:
+  assessments_app:
+    build: 
+      context: .
+      dockerfile: dockerfile
+    container_name: assessment_app_dev
+    env_file:
+      - .env.dev
+    ports:
+      - 8082:8000
+    # depends_on:
+    #   - local_pg_dev
+    networks:
+      - shared_local_network
+
+networks:
+  shared_local_network:
+    external: true
+    name: "shared_local_network"
