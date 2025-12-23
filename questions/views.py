@@ -1,10 +1,16 @@
 # questions/views.py
+from typing import Type
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, permissions, filters
 from .filters import QuestionFilter
-from .models import Domain, Topic, Question
-from .serializers import DomainSerializer, TopicSerializer, QuestionSerializer
+from .models.models import Domain, Topic, Question  # Keep models for queryset
+from .serializers import (
+    DomainSerializer,
+    TopicSerializer,
+    QuestionSerializer,
+    QuestionListSerializer,
+)
 
 
 class DomainViewSet(viewsets.ModelViewSet):
@@ -28,7 +34,13 @@ class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.select_related("domain", "topic", "created_by").filter(
         is_active=True
     )
-    serializer_class = QuestionSerializer
+    # serializer_class = QuestionSerializer # Removed, now dynamically set by get_serializer_class
+
+    def get_serializer_class(self) -> Type[QuestionSerializer | QuestionListSerializer]:  # type: ignore
+        if self.action == "list":
+            return QuestionListSerializer
+        return QuestionSerializer
+
     # permission_classes = [permissions.IsAuthenticated]
     permission_classes = [permissions.AllowAny]
 

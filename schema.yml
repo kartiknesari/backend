@@ -675,6 +675,20 @@ components:
         * `0` - User
         * `1` - Manager
         * `2` - Administrator
+    CasePayload:
+      type: object
+      properties:
+        rubric:
+          description: '{"criteria": "Safety", "max": 5, "weight": 0.4}'
+    DiagramPayload:
+      type: object
+      properties:
+        image:
+          type: string
+          format: uri
+        hotspots: {}
+      required:
+      - image
     Domain:
       type: object
       properties:
@@ -697,6 +711,39 @@ components:
       required:
       - id
       - name
+    MCQPayload:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        options:
+          type: object
+          additionalProperties:
+            type: string
+          description: Dictionary mapping id(uuid) to text(string)
+        correct:
+          description: List of IDs of correct option(s)
+        shuffle:
+          type: boolean
+      required:
+      - id
+      - options
+    NumericalPayload:
+      type: object
+      properties:
+        answer:
+          type: number
+          format: double
+        unit:
+          type: string
+          maxLength: 20
+        tolerance:
+          type: number
+          format: double
+          description: Relative tolerance (e.g., 0.02 = ±2%)
+      required:
+      - answer
     PatchedDomain:
       type: object
       properties:
@@ -767,6 +814,22 @@ components:
           readOnly: true
         is_active:
           type: boolean
+        mcq_payload:
+          allOf:
+          - $ref: '#/components/schemas/MCQPayload'
+          nullable: true
+        num_payload:
+          allOf:
+          - $ref: '#/components/schemas/NumericalPayload'
+          nullable: true
+        case_payload:
+          allOf:
+          - $ref: '#/components/schemas/CasePayload'
+          nullable: true
+        diag_payload:
+          allOf:
+          - $ref: '#/components/schemas/DiagramPayload'
+          nullable: true
     PatchedTopic:
       type: object
       properties:
@@ -858,6 +921,22 @@ components:
           readOnly: true
         is_active:
           type: boolean
+        mcq_payload:
+          allOf:
+          - $ref: '#/components/schemas/MCQPayload'
+          nullable: true
+        num_payload:
+          allOf:
+          - $ref: '#/components/schemas/NumericalPayload'
+          nullable: true
+        case_payload:
+          allOf:
+          - $ref: '#/components/schemas/CasePayload'
+          nullable: true
+        diag_payload:
+          allOf:
+          - $ref: '#/components/schemas/DiagramPayload'
+          nullable: true
       required:
       - created_at
       - domain
