@@ -5,6 +5,33 @@ info:
   description: An online assessment backend specifically for chemical engineering
     tests
 paths:
+  /api/token/:
+    post:
+      operationId: token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomTokenObtainPair'
+          description: ''
   /api/token/refresh/:
     post:
       operationId: token_refresh_create
@@ -62,6 +89,8 @@ paths:
       - v1
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -70,7 +99,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Question'
+                  $ref: '#/components/schemas/QuestionList'
           description: ''
     post:
       operationId: v1_questions_create
@@ -90,6 +119,8 @@ paths:
         required: true
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '201':
@@ -113,6 +144,8 @@ paths:
       - v1
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -147,6 +180,8 @@ paths:
         required: true
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -180,6 +215,8 @@ paths:
               $ref: '#/components/schemas/PatchedQuestion'
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -202,6 +239,8 @@ paths:
       - v1
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '204':
@@ -213,6 +252,8 @@ paths:
       - v1
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -241,6 +282,8 @@ paths:
         required: true
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '201':
@@ -264,6 +307,8 @@ paths:
       - v1
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -298,6 +343,8 @@ paths:
         required: true
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -331,6 +378,8 @@ paths:
               $ref: '#/components/schemas/PatchedDomain'
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -353,6 +402,8 @@ paths:
       - v1
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '204':
@@ -376,6 +427,8 @@ paths:
       - v1
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -404,6 +457,8 @@ paths:
         required: true
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '201':
@@ -427,6 +482,8 @@ paths:
       - v1
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -461,6 +518,8 @@ paths:
         required: true
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -494,6 +553,8 @@ paths:
               $ref: '#/components/schemas/PatchedTopic'
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -516,6 +577,8 @@ paths:
       - v1
       security:
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '204':
@@ -527,7 +590,8 @@ paths:
       - v1
       security:
       - jwtAuth: []
-      - {}
+      - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -545,38 +609,42 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UserSignup'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UserSignup'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/UserSignup'
         required: true
       security:
       - jwtAuth: []
-      - {}
+      - basicAuth: []
+      - cookieAuth: []
       responses:
         '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserSignup'
           description: ''
-  /api/v1/users/{id}/:
+  /api/v1/users/{user_id}/:
     get:
       operationId: v1_users_retrieve
       parameters:
       - in: path
-        name: id
+        name: user_id
         schema:
           type: string
+          format: uuid
+        description: A UUID string identifying this custom user.
         required: true
       tags:
       - v1
       security:
       - jwtAuth: []
-      - {}
+      - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -588,9 +656,11 @@ paths:
       operationId: v1_users_update
       parameters:
       - in: path
-        name: id
+        name: user_id
         schema:
           type: string
+          format: uuid
+        description: A UUID string identifying this custom user.
         required: true
       tags:
       - v1
@@ -608,7 +678,8 @@ paths:
         required: true
       security:
       - jwtAuth: []
-      - {}
+      - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -620,9 +691,11 @@ paths:
       operationId: v1_users_partial_update
       parameters:
       - in: path
-        name: id
+        name: user_id
         schema:
           type: string
+          format: uuid
+        description: A UUID string identifying this custom user.
         required: true
       tags:
       - v1
@@ -639,7 +712,8 @@ paths:
               $ref: '#/components/schemas/PatchedUser'
       security:
       - jwtAuth: []
-      - {}
+      - basicAuth: []
+      - cookieAuth: []
       responses:
         '200':
           content:
@@ -651,35 +725,40 @@ paths:
       operationId: v1_users_destroy
       parameters:
       - in: path
-        name: id
+        name: user_id
         schema:
           type: string
+          format: uuid
+        description: A UUID string identifying this custom user.
         required: true
       tags:
       - v1
       security:
       - jwtAuth: []
-      - {}
+      - basicAuth: []
+      - cookieAuth: []
       responses:
         '204':
           description: No response body
 components:
   schemas:
-    AccessLevelEnum:
-      enum:
-      - 0
-      - 1
-      - 2
-      type: integer
-      description: |-
-        * `0` - User
-        * `1` - Manager
-        * `2` - Administrator
     CasePayload:
       type: object
       properties:
         rubric:
           description: '{"criteria": "Safety", "max": 5, "weight": 0.4}'
+    CustomTokenObtainPair:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
     DiagramPayload:
       type: object
       properties:
@@ -708,6 +787,19 @@ components:
           type: string
         is_active:
           type: boolean
+      required:
+      - id
+      - name
+    DomainNameId:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
       required:
       - id
       - name
@@ -856,20 +948,47 @@ components:
           type: string
           format: uuid
           readOnly: true
+        first_name:
+          type: string
+          maxLength: 150
         middle_name:
+          type: string
+          maxLength: 150
+        last_name:
           type: string
           maxLength: 150
         email:
           type: string
           format: email
           maxLength: 254
+        dob:
+          type: string
+          format: date
+          nullable: true
         role:
           $ref: '#/components/schemas/RoleEnum'
-        access_level:
-          allOf:
-          - $ref: '#/components/schemas/AccessLevelEnum'
-          minimum: -2147483648
-          maximum: 2147483647
+        is_superuser:
+          type: boolean
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+        is_staff:
+          type: boolean
+          title: Staff status
+          description: Designates whether the user can log into this admin site.
+        user_permissions:
+          type: array
+          items:
+            type: integer
+          description: Specific permissions for this user.
+        date_joined:
+          type: string
+          format: date-time
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
     Question:
       type: object
       properties:
@@ -944,6 +1063,73 @@ components:
       - question
       - type
       - updated_at
+    QuestionList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        domain:
+          allOf:
+          - $ref: '#/components/schemas/DomainNameId'
+          readOnly: true
+        topic:
+          allOf:
+          - $ref: '#/components/schemas/TopicNameIdSlug'
+          readOnly: true
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeEnum'
+          readOnly: true
+        question:
+          type: string
+          readOnly: true
+          description: LaTeX supported. Use $$ for display math.
+        description:
+          type: string
+          readOnly: true
+          description: Solution / explanation shown after grading
+        difficulty:
+          type: integer
+          readOnly: true
+          description: 1 = easy, 5 = expert
+        points:
+          type: integer
+          readOnly: true
+          description: Score weight
+        time_estimate_seconds:
+          type: integer
+          readOnly: true
+          description: Expected time
+        created_by:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+      required:
+      - created_at
+      - created_by
+      - description
+      - difficulty
+      - domain
+      - id
+      - is_active
+      - points
+      - question
+      - time_estimate_seconds
+      - topic
+      - type
+      - updated_at
     RoleEnum:
       enum:
       - candidate
@@ -953,9 +1139,9 @@ components:
       type: string
       description: |-
         * `candidate` - Candidate
-        * `manager` - Recruiter
-        * `sme` - Subject Matter Expert
-        * `administrator` - administrator
+        * `manager` - Manager
+        * `sme` - SME
+        * `administrator` - Administrator
     TokenRefresh:
       type: object
       properties:
@@ -991,6 +1177,23 @@ components:
       - domain
       - id
       - name
+    TopicNameIdSlug:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        slug:
+          type: string
+          maxLength: 100
+          pattern: ^[-a-zA-Z0-9_]+$
+      required:
+      - id
+      - name
     TypeEnum:
       enum:
       - mcq
@@ -1010,25 +1213,94 @@ components:
           type: string
           format: uuid
           readOnly: true
+        first_name:
+          type: string
+          maxLength: 150
         middle_name:
+          type: string
+          maxLength: 150
+        last_name:
           type: string
           maxLength: 150
         email:
           type: string
           format: email
           maxLength: 254
+        dob:
+          type: string
+          format: date
+          nullable: true
         role:
           $ref: '#/components/schemas/RoleEnum'
-        access_level:
-          allOf:
-          - $ref: '#/components/schemas/AccessLevelEnum'
-          minimum: -2147483648
-          maximum: 2147483647
+        is_superuser:
+          type: boolean
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+        is_staff:
+          type: boolean
+          title: Staff status
+          description: Designates whether the user can log into this admin site.
+        user_permissions:
+          type: array
+          items:
+            type: integer
+          description: Specific permissions for this user.
+        date_joined:
+          type: string
+          format: date-time
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
       required:
       - email
-      - role
+      - user_id
+    UserSignup:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          minLength: 2
+        middle_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        dob:
+          type: string
+          format: date
+          nullable: true
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+      required:
+      - email
+      - first_name
+      - last_name
+      - password
       - user_id
   securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
     jwtAuth:
       type: http
       scheme: bearer

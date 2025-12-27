@@ -13,18 +13,28 @@ from .serializers import (
 )
 
 
+class CustomDjangoModelPermissions(permissions.DjangoModelPermissions):
+    perms_map = {
+        "GET": ["%(app_label)s.view_%(model_name)s"],
+        "OPTIONS": [],
+        "HEAD": [],
+        "POST": ["%(app_label)s.add_%(model_name)s"],
+        "PUT": ["%(app_label)s.change_%(model_name)s"],
+        "PATCH": ["%(app_label)s.change_%(model_name)s"],
+        "DELETE": ["%(app_label)s.delete_%(model_name)s"],
+    }
+
+
 class DomainViewSet(viewsets.ModelViewSet):
     queryset = Domain.objects.filter(is_active=True)
     serializer_class = DomainSerializer
-    # permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [CustomDjangoModelPermissions]
 
 
 class TopicViewSet(viewsets.ModelViewSet):
     queryset = Topic.objects.select_related("domain").filter(domain__is_active=True)
     serializer_class = TopicSerializer
-    # permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [CustomDjangoModelPermissions]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ["domain"]
     search_fields = ["name"]
@@ -34,32 +44,14 @@ class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.select_related("domain", "topic", "created_by").filter(
         is_active=True
     )
-    # serializer_class = QuestionSerializer # Removed, now dynamically set by get_serializer_class
 
+    permission_classes = [CustomDjangoModelPermissions]
+
+    # serializer_class = QuestionSerializer # Removed, now dynamically set by get_serializer_class
     def get_serializer_class(self) -> Type[QuestionSerializer | QuestionListSerializer]:  # type: ignore
         if self.action == "list":
             return QuestionListSerializer
         return QuestionSerializer
 
-    # permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
-
     filter_backends = [DjangoFilterBackend]
     filterset_class = QuestionFilter
-
-    # Disabled because filterset_class takes precedence between the both
-    # Choose either but filterset_class is more powerful and explicit
-    # filterset_fields = ["domain__slug", "topic__slug", "type"]
-
-    # def get_queryset(self):
-    #     qs = super().get_queryset()
-    #     domain = self.request.query_params.get("domain")
-    #     topic = self.request.query_params.get("topic")
-    #     qtype = self.request.query_params.get("type")
-    #     if domain:
-    #         qs = qs.filter(domain__slug=domain)
-    #     if topic:
-    #         qs = qs.filter(topic__slug=topic)
-    #     if qtype:
-    #         qs = qs.filter(type=qtype)
-    #     return qs

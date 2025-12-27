@@ -1,6 +1,6 @@
 from django.db import IntegrityError
-from django.contrib.auth import authenticate
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import CustomUser
 
 
@@ -11,22 +11,21 @@ class UserSignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            "user_id",
+            "id",
             "first_name",
             "middle_name",
             "last_name",
             "email",
+            "dob",
             "password",
             "role",
-            "access_level",
         ]
         extra_kwargs = {
-            "user_id": {"read_only": True},
+            "id": {"read_only": True},
             "first_name": {"required": True},
             "last_name": {"required": True},
             "email": {"required": True},
-            "role": {"required": True},
-            "access_level": {"required": True},
+            "password": {"required": True},
         }
 
     def validate_email(self, value):
@@ -59,36 +58,31 @@ class UserSignupSerializer(serializers.ModelSerializer):
             )
 
 
-class UserSigninSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    password = serializers.CharField(write_only=True, required=True)
-
-    def validate_email(self, value):
-        return value.lower()
-
-    def validate(self, attrs):
-        email = attrs.get("email")
-        password = attrs.get("password")
-        if not email or not password:
-            raise serializers.ValidationError(
-                {"non_field_errors": ["Email and password are required."]}
-            )
-        request = self.context.get("request")
-        if not request:
-            raise serializers.ValidationError(
-                {"non_field_errors": ["Request context is missing."]}
-            )
-        user = authenticate(
-            request=self.context.get("request"), email=email, password=password
-        )
-        if not user:
-            raise serializers.ValidationError(
-                {"non_field_errors": ["Invalid email or password."]}
-            )
-        attrs["user"] = user
-        return attrs
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ["user_id", "middle_name", "email", "role", "access_level"]
+        fields = [
+            "id",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "email",
+            "dob",
+            "role",
+            "is_superuser",
+            "is_staff",
+            "user_permissions",
+            "date_joined",
+            "is_active",
+        ]
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data["role"] = self.user.role
+        data["id"] = str(self.user.id)
+        data["email"] = self.user.email
+        data["first_name"] = self.user.first_name
+        data["last_name"] = self.user.last_name
+        return data

@@ -30,9 +30,13 @@ INSTALLED_APPS = [
     "django_filters",
     "rest_framework",
     "corsheaders",
+    "drf_spectacular",
+    # Authentication
+    "rest_framework.authtoken",
+    "rest_framework_simplejwt",
+    # User Apps
     "users",
     "questions",
-    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -106,6 +110,8 @@ AUTH_USER_MODEL = "users.CustomUser"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
@@ -114,6 +120,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://corene-urbanistic-lin.ngrok-free.dev",
     "https://active-tuna-82.rshare.io",
+    "https://projectasapp.vercel.app",
 ]
 CORS_ALLOW_ALL_ORIGINS = True  # Only for development!
 
@@ -140,4 +147,16 @@ SPECTACULAR_SETTINGS = {
         {"url": HOST_IP, "description": "Local development server"},
     ],
     # OTHER SETTINGS
+}
+
+
+# JWT Settings
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": True,
 }
