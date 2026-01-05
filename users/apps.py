@@ -1,3 +1,8 @@
+from asyncio.log import logger
+import logging
+import smtplib
+import socket
+from django.conf import settings
 from django.apps import AppConfig
 from django.db.models.signals import post_migrate
 
@@ -56,6 +61,51 @@ all_permissions = {
 }
 
 
+class UsersAppConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "users"
+    verbose_name = "Users"
+
+
+class UsersConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "users"
+
+    def ready(self):
+        post_migrate.connect(create_role_groups, sender=self)
+        # Only run this check if the EMAIL_BACKEND is SMTP
+        if settings.EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
+            logger.info("Attempting to connect to email server during startup...")
+            try:
+                # Attempt to establish a connection to the SMTP server
+                # Use a timeout to prevent hanging if the server is unreachable
+                with smtplib.SMTP(
+                    settings.EMAIL_HOST, settings.EMAIL_PORT, timeout=5
+                ) as server:
+                    server.noop()  # Send a NOOP command to test the connection
+                logger.info(
+                    f"Successfully connected to email server at {settings.EMAIL_HOST}:{settings.EMAIL_PORT}"
+                )
+            except (
+                smtplib.SMTPConnectError,
+                ConnectionRefusedError,
+                socket.gaierror,  # Catches "Name or service not known"
+                TimeoutError,
+                OSError,
+            ) as e:
+                logger.error(
+                    f"Failed to connect to email server at {settings.EMAIL_HOST}:{settings.EMAIL_PORT}. Error: {e}. Please ensure the email server is running and accessible."
+                )
+            except Exception as e:
+                logger.error(
+                    f"An unexpected error occurred during email server connection check: {e}"
+                )
+        else:
+            logger.info(
+                f"Email backend is not SMTP ({settings.EMAIL_BACKEND}), skipping connection check."
+            )
+
+
 def create_role_groups(sender, **kwargs):
     from django.contrib.auth.models import Group, Permission
     from .models import CustomUser
@@ -67,9 +117,9 @@ def create_role_groups(sender, **kwargs):
             *all_permissions["users"].values(),
             *all_permissions["questions"].values(),
         ],
-        "sme": [*all_permissions["questions"].values()],
-        "manager": [],
-        "candidate": [],  # Usually no API permissions, handled by frontend logic
+        "manager": [*all_permissions["questions"].values()],
+        "instructor": [],
+        "data_entry": [],  # Usually no API permissions, handled by frontend logic
     }
 
     for role_value in role_permissions.keys():
@@ -94,11 +144,3 @@ def create_role_groups(sender, **kwargs):
                 group.permissions.set(
                     perms_to_add
                 )  # .set() replaces old perms with this new list
-
-
-class UsersConfig(AppConfig):
-    default_auto_field = "django.db.models.BigAutoField"
-    name = "users"
-
-    def ready(self):
-        post_migrate.connect(create_role_groups, sender=self)

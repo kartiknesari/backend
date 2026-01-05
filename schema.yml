@@ -59,6 +59,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenRefresh'
           description: ''
+  /api/token/verify/:
+    post:
+      operationId: token_verify_create
+      description: |-
+        Takes a token and indicates if it is valid.  This view provides no
+        information about a token's fitness for a particular use.
+      tags:
+      - token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenVerify'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenVerify'
+          description: ''
   /api/v1/questions/:
     get:
       operationId: v1_questions_list
@@ -91,7 +118,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -121,7 +147,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '201':
           content:
@@ -146,7 +171,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -182,7 +206,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -217,7 +240,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -241,7 +263,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '204':
           description: No response body
@@ -254,7 +275,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -284,7 +304,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '201':
           content:
@@ -309,7 +328,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -345,7 +363,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -380,7 +397,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -404,7 +420,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '204':
           description: No response body
@@ -429,7 +444,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -459,7 +473,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '201':
           content:
@@ -484,7 +497,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -520,7 +532,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -555,7 +566,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -579,7 +589,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '204':
           description: No response body
@@ -590,8 +599,6 @@ paths:
       - v1
       security:
       - jwtAuth: []
-      - basicAuth: []
-      - cookieAuth: []
       responses:
         '200':
           content:
@@ -619,8 +626,6 @@ paths:
         required: true
       security:
       - jwtAuth: []
-      - basicAuth: []
-      - cookieAuth: []
       responses:
         '201':
           content:
@@ -628,12 +633,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserSignup'
           description: ''
-  /api/v1/users/{user_id}/:
+  /api/v1/users/{id}/:
     get:
       operationId: v1_users_retrieve
       parameters:
       - in: path
-        name: user_id
+        name: id
         schema:
           type: string
           format: uuid
@@ -643,8 +648,6 @@ paths:
       - v1
       security:
       - jwtAuth: []
-      - basicAuth: []
-      - cookieAuth: []
       responses:
         '200':
           content:
@@ -656,7 +659,7 @@ paths:
       operationId: v1_users_update
       parameters:
       - in: path
-        name: user_id
+        name: id
         schema:
           type: string
           format: uuid
@@ -678,8 +681,6 @@ paths:
         required: true
       security:
       - jwtAuth: []
-      - basicAuth: []
-      - cookieAuth: []
       responses:
         '200':
           content:
@@ -691,7 +692,7 @@ paths:
       operationId: v1_users_partial_update
       parameters:
       - in: path
-        name: user_id
+        name: id
         schema:
           type: string
           format: uuid
@@ -712,8 +713,6 @@ paths:
               $ref: '#/components/schemas/PatchedUser'
       security:
       - jwtAuth: []
-      - basicAuth: []
-      - cookieAuth: []
       responses:
         '200':
           content:
@@ -725,7 +724,7 @@ paths:
       operationId: v1_users_destroy
       parameters:
       - in: path
-        name: user_id
+        name: id
         schema:
           type: string
           format: uuid
@@ -735,11 +734,106 @@ paths:
       - v1
       security:
       - jwtAuth: []
-      - basicAuth: []
-      - cookieAuth: []
       responses:
         '204':
           description: No response body
+  /api/v1/users/check-email/:
+    post:
+      operationId: v1_users_check_email_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailCheckRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmailCheckRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmailCheckRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailCheckResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/v1/users/set-initial-password/:
+    post:
+      operationId: v1_users_set_initial_password_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitialPasswordSet'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InitialPasswordSet'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InitialPasswordSet'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetPasswordResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/v1/users/set-password/:
+    post:
+      operationId: v1_users_set_password_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetPasswordResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
 components:
   schemas:
     CasePayload:
@@ -803,6 +897,61 @@ components:
       required:
       - id
       - name
+    EmailCheckRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    EmailCheckResponse:
+      type: object
+      properties:
+        exists:
+          type: boolean
+        message:
+          type: string
+      required:
+      - exists
+      - message
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        code:
+          type: integer
+        message:
+          type: string
+      required:
+      - error
+      - message
+    InitialPasswordSet:
+      type: object
+      properties:
+        id:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          writeOnly: true
+        temp_password:
+          type: string
+          writeOnly: true
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        new_password_confirm:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - id
+      - new_password
+      - new_password_confirm
+      - temp_password
     MCQPayload:
       type: object
       properties:
@@ -944,7 +1093,7 @@ components:
     PatchedUser:
       type: object
       properties:
-        user_id:
+        id:
           type: string
           format: uuid
           readOnly: true
@@ -965,6 +1114,10 @@ components:
           type: string
           format: date
           nullable: true
+        date_joined:
+          type: string
+          format: date
+          readOnly: true
         role:
           $ref: '#/components/schemas/RoleEnum'
         is_superuser:
@@ -981,14 +1134,13 @@ components:
           items:
             type: integer
           description: Specific permissions for this user.
-        date_joined:
-          type: string
-          format: date-time
         is_active:
           type: boolean
           title: Active
           description: Designates whether this user should be treated as active. Unselect
             this instead of deleting accounts.
+        is_temp_password:
+          type: boolean
     Question:
       type: object
       properties:
@@ -1142,6 +1294,30 @@ components:
         * `manager` - Manager
         * `sme` - SME
         * `administrator` - Administrator
+    SetPassword:
+      type: object
+      properties:
+        current_password:
+          type: string
+          writeOnly: true
+        new_password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        new_password_confirm:
+          type: string
+          writeOnly: true
+      required:
+      - current_password
+      - new_password
+      - new_password_confirm
+    SetPasswordResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
     TokenRefresh:
       type: object
       properties:
@@ -1150,10 +1326,17 @@ components:
           readOnly: true
         refresh:
           type: string
-          writeOnly: true
       required:
       - access
       - refresh
+    TokenVerify:
+      type: object
+      properties:
+        token:
+          type: string
+          writeOnly: true
+      required:
+      - token
     Topic:
       type: object
       properties:
@@ -1209,7 +1392,7 @@ components:
     User:
       type: object
       properties:
-        user_id:
+        id:
           type: string
           format: uuid
           readOnly: true
@@ -1230,6 +1413,10 @@ components:
           type: string
           format: date
           nullable: true
+        date_joined:
+          type: string
+          format: date
+          readOnly: true
         role:
           $ref: '#/components/schemas/RoleEnum'
         is_superuser:
@@ -1246,21 +1433,21 @@ components:
           items:
             type: integer
           description: Specific permissions for this user.
-        date_joined:
-          type: string
-          format: date-time
         is_active:
           type: boolean
           title: Active
           description: Designates whether this user should be treated as active. Unselect
             this instead of deleting accounts.
+        is_temp_password:
+          type: boolean
       required:
+      - date_joined
       - email
-      - user_id
+      - id
     UserSignup:
       type: object
       properties:
-        user_id:
+        id:
           type: string
           format: uuid
           readOnly: true
@@ -1281,18 +1468,17 @@ components:
           type: string
           format: date
           nullable: true
-        password:
+        date_joined:
           type: string
-          writeOnly: true
-          minLength: 8
+          format: date
         role:
           $ref: '#/components/schemas/RoleEnum'
       required:
+      - date_joined
       - email
       - first_name
+      - id
       - last_name
-      - password
-      - user_id
   securitySchemes:
     basicAuth:
       type: http

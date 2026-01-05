@@ -4,10 +4,12 @@ from dotenv import load_dotenv
 
 if "IS_DOCKER_CONTAINER" not in os.environ:
     load_dotenv(dotenv_path=".env.local")
-    print("Loaded local env file")
+    print("Loaded local .env file")
+    _default_email_host = "localhost"  # Default for local development
 else:
     # env variables already loaded via docker
     print("Loaded docker env variables")
+    _default_email_host = "email_server"  # Use the service name for Docker Compose
     pass
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -123,6 +125,20 @@ CORS_ALLOWED_ORIGINS = [
     "https://projectasapp.vercel.app",
 ]
 CORS_ALLOW_ALL_ORIGINS = True  # Only for development!
+
+# Email
+# Configuration for a local email testing tool like Mailpit.
+# This will catch all outgoing emails and display them in a web UI.
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.environ.get("EMAIL_HOST", _default_email_host)
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 1025))
+EMAIL_USE_TLS = False
+DEFAULT_FROM_EMAIL = "noreply@hrapp.com"
+
+# settings.py
+# The base URL of your frontend application (e.g., React, Vue, Angular)
+CLIENT_URL = os.environ.get("CLIENT_URL", "localhost")
+
 
 # Add ngrok-skip-browser-warning to allowed headers for ngrok usage
 CORS_ALLOW_HEADERS = [

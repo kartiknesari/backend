@@ -1,6 +1,8 @@
+import datetime
 from django.contrib.auth.models import AbstractUser, Group
 from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
+from django.utils.crypto import get_random_string
 import uuid
 
 
@@ -27,12 +29,24 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+    def make_random_password(
+        self,
+        length=10,
+        allowed_chars="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789",
+    ):
+        """
+        Generate a random password with the given length and allowed characters.
+        The default value of allowed_chars does not have "I" or "O" or "l" or
+        "0" or "1", to avoid confusion between similar characters.
+        """
+        return get_random_string(length, allowed_chars)
+
 
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
-        ("candidate", "Candidate"),
+        ("data_entry", "Data Entry Operator"),
         ("manager", "Manager"),
-        ("sme", "SME"),
+        ("instructor", "Instructor"),
         ("administrator", "Administrator"),
     ]
 
@@ -41,12 +55,14 @@ class CustomUser(AbstractUser):
     middle_name = models.CharField(max_length=150, blank=True)
     email = models.EmailField(unique=True, blank=False)
     dob = models.DateField(null=True, blank=True)
+    date_joined = models.DateField(default=datetime.date.today)
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default="candidate")
+    is_temp_password = models.BooleanField(default=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
 
-    objects = CustomUserManager()
+    objects = CustomUserManager()  # type: ignore
 
     def save(self, *args, **kwargs):
         if self.email:
@@ -65,7 +81,7 @@ class CustomUser(AbstractUser):
 
     class Meta:
         indexes = [
-            models.Index(fields=["email"]),
+            models.Index(fields=["email", "id"]),
         ]
 
     def __str__(self):
