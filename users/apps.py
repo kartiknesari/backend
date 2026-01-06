@@ -1,4 +1,3 @@
-from asyncio.log import logger
 import logging
 import smtplib
 import socket
@@ -6,13 +5,7 @@ from django.conf import settings
 from django.apps import AppConfig
 from django.db.models.signals import post_migrate
 
-""" 
-def create_role_groups(sender, **kwargs):
-    from django.contrib.auth.models import Group
-    from .models import CustomUser
-
-    for role_value, _ in CustomUser.ROLE_CHOICES:
-        Group.objects.get_or_create(name=role_value) """
+logger = logging.getLogger(__name__)
 
 all_permissions = {
     "users": {
@@ -61,12 +54,6 @@ all_permissions = {
 }
 
 
-class UsersAppConfig(AppConfig):
-    default_auto_field = "django.db.models.BigAutoField"
-    name = "users"
-    verbose_name = "Users"
-
-
 class UsersConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "users"
@@ -106,9 +93,11 @@ class UsersConfig(AppConfig):
             )
 
 
+# Move create_role_groups here, and its imports inside the function
 def create_role_groups(sender, **kwargs):
+    # Imports are moved inside the function to avoid AppRegistryNotReady error
     from django.contrib.auth.models import Group, Permission
-    from .models import CustomUser
+    from users.models import CustomUser  # Use absolute import for clarity
 
     # 1. Define what each role is allowed to do
     # Format: 'app_label.codename'
